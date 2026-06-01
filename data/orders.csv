@@ -1,5 +1,11 @@
-order_id, customer, product, quantity, unit_price
-1001, Amy, Li Hing Plum, 2, 28.25
-1002, Ben, Nibb-its, 5, 2.02
-1001, Amy, Li Hing Plum, 2, 28.25
-1003, Chris, Li Hing Mango, 3, 28.25
+order_id,customer,product,quantity,unit_price,order_date
+1001,Amy,Li Hing Plum,2,28.25,2026-05-01
+1002,Ben,Nibb-its,5,2.02,2026-05-01
+1001,Amy,Li Hing Plum,2,28.25,2026-05-01
+1003,Chris,Li Hing Mango,3,28.25,2026-05-02
+1004,Dana,Nibb-its,-1,2.02,2026-05-03
+,Eric,Li Hing Plum,1,28.25,2026-05-04
+1005,Fiona,,4,2.02,2026-05-04
+1006,George,Nibb-its,abc,2.02,2026-05-05
+1007,Hannah,Li Hing Mango,2,bad_price,2026-05-05
+1008,Ian,Nibb-its,10,2.02,2026-05-06
