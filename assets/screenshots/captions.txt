@@ -1,0 +1,5 @@
+streamlit_main.png: Streamlit interactive demo showing cleaned orders and revenue-by-product chart.
+summary_txt.png: Terminal showing the human-readable `reports/summary.txt` output.
+clean_csv_preview.png: Preview of `reports/clean_orders.csv` opened in VS Code.
+tests_run.png: Output from `python run_tests.py` indicating tests passed.
+package_install.png: Installing package locally and running `csv-order-analyzer --help`.

@@ -1,0 +1,30 @@
+Sales Data Quality Report
+-------------------------
+Valid orders: 5
+Invalid orders: 4
+Duplicate orders: 0
+Total revenue: $183.64
+Average order value: $36.73
+Best product: Li Hing Plum ($141.25)
+Best customer: Alice ($84.75)
+
+Revenue by Product
+------------------
+Li Hing Plum: $141.25
+Li Hing Mango: $28.25
+Nibb-its: $14.14
+
+Revenue by Customer
+-------------------
+Alice: $84.75
+Ed: $56.50
+Charlie: $28.25
+Dana: $10.10
+Bob: $4.04
+
+Error Breakdown
+---------------
+Missing product: 1
+Quantity must be positive: 1
+Missing order ID: 1
+Invalid quantity or unit price: 1

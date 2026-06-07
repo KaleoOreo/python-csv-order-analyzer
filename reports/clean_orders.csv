@@ -1,0 +1,6 @@
+order_id,customer,product,quantity,unit_price,order_date,revenue
+2001,Alice,Li Hing Plum,3,28.25,2026-05-10,84.75
+2002,Bob,Nibb-its,2,2.02,2026-05-10,4.04
+2003,Charlie,Li Hing Mango,1,28.25,2026-05-11,28.25
+2004,Dana,Nibb-its,5,2.02,2026-05-12,10.1
+2005,Ed,Li Hing Plum,2,28.25,2026-05-13,56.5

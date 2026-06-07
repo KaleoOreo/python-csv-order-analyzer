@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "csv-order-analyzer"
+version = "0.1.0"
+description = "CSV Order Analyzer — cleans and summarizes order CSVs"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+"pandas",
+"matplotlib",
+"streamlit"
+]
+
+[project.urls]
+"Homepage" = "https://example.com/"
+
+[project.scripts]
+csv-order-analyzer = "src.main:main"

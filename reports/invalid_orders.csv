@@ -1,0 +1,5 @@
+order_id,customer,product,quantity,unit_price,order_date,error
+2006,Fran,,4,2.02,2026-05-13,Missing product
+2007,George,Nibb-its,-1,2.02,2026-05-14,Quantity must be positive
+,Henry,Li Hing Plum,1,28.25,2026-05-15,Missing order ID
+2008,Ian,Nibb-its,3,bad_price,2026-05-16,Invalid quantity or unit price

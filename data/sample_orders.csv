@@ -1,0 +1,10 @@
+order_id,customer,product,quantity,unit_price,order_date
+2001,Alice,Li Hing Plum,3,28.25,2026-05-10
+2002,Bob,Nibb-its,2,2.02,2026-05-10
+2003,Charlie,Li Hing Mango,1,28.25,2026-05-11
+2004,Dana,Nibb-its,5,2.02,2026-05-12
+2005,Ed,Li Hing Plum,2,28.25,2026-05-13
+2006,Fran,,4,2.02,2026-05-13
+2007,George,Nibb-its,-1,2.02,2026-05-14
+,Henry,Li Hing Plum,1,28.25,2026-05-15
+2008,Ian,Nibb-its,3,bad_price,2026-05-16

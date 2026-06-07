@@ -1,141 +1,73 @@
-import csv
+"""CLI entry point for the CSV Order Analyzer project.
 
-INPUT_FILE = "data/orders.csv"
-SUMMARY_FILE = "reports/summary.txt"
-CLEAN_ORDERS_FILE = "reports/clean_orders.csv"
-INVALID_ORDERS_FILE = "reports/invalid_orders.csv"
-DUPLICATE_ORDERS_FILE = "reports/duplicate_orders.csv"
+This file wires together the processing, summarization, and I/O modules and
+exposes a small command-line interface for running the pipeline against a
+CSV file.
+"""
 
-valid_orders = []
-invalid_orders = []
-duplicate_orders = []
-seen_order_ids = set()
+import argparse
+from pathlib import Path
+from typing import List
 
-with open(INPUT_FILE, "r", encoding="utf-8") as file:
-    reader = csv.DictReader(file)
+from src.processing import classify_orders
+from src.summary import summarize_orders, format_report
+from src.io import write_csv_report, OUTPUT_FIELDNAMES
 
-    for row in reader:
-        order_id = row["order_id"].strip()
-        product = row["product"].strip()
-        quantity_text = row["quantity"].strip()
-        unit_price_text = row["unit_price"].strip()
 
-        if order_id == "":
-            row["error"] = "Missing order ID"
-            invalid_orders.append(row)
-            continue
+DEFAULT_INPUT_FILE = Path("data/orders.csv")
+DEFAULT_REPORTS_DIR = Path("reports")
 
-        if order_id in seen_order_ids:
-            row["error"] = "Duplicate order ID"
-            duplicate_orders.append(row)
-            continue
+SUMMARY_FILE_NAME = "summary.txt"
+CLEAN_ORDERS_FILE_NAME = "clean_orders.csv"
+INVALID_ORDERS_FILE_NAME = "invalid_orders.csv"
+DUPLICATE_ORDERS_FILE_NAME = "duplicate_orders.csv"
 
-        if product == "":
-            row["error"] = "Missing product"
-            invalid_orders.append(row)
-            continue
+ERROR_FIELDNAMES: List[str] = OUTPUT_FIELDNAMES + ["error"]
+CLEAN_FIELDNAMES: List[str] = OUTPUT_FIELDNAMES + ["revenue"]
 
-        try:
-            quantity = int(quantity_text)
-            unit_price = float(unit_price_text)
-        except ValueError:
-            row["error"] = "Invalid quantity or unit price"
-            invalid_orders.append(row)
-            continue
 
-        if quantity <= 0:
-            row["error"] = "Quantity must be positive"
-            invalid_orders.append(row)
-            continue
+def parse_arguments() -> argparse.Namespace:
+    """Parse CLI arguments and return the result.
 
-        if unit_price <= 0:
-            row["error"] = "Unit price must be positive"
-            invalid_orders.append(row)
-            continue
+    Returns an argparse.Namespace with `.input` and `.reports_dir` attributes.
+    """
+    parser = argparse.ArgumentParser(
+        description="Clean an orders CSV file and generate a small analytics report."
+    )
+    parser.add_argument("--input", type=Path, default=DEFAULT_INPUT_FILE, help="Path to the raw orders CSV file.")
+    parser.add_argument(
+        "--reports-dir",
+        type=Path,
+        default=DEFAULT_REPORTS_DIR,
+        help="Directory where cleaned files and reports should be written.",
+    )
+    return parser.parse_args()
 
-        seen_order_ids.add(order_id)
 
-        row["quantity"] = quantity
-        row["unit_price"] = unit_price
-        row["revenue"] = quantity * unit_price
+def main() -> None:
+    """Run the full processing pipeline and write reports to disk."""
+    arguments = parse_arguments()
+    reports_dir = arguments.reports_dir
+    reports_dir.mkdir(parents=True, exist_ok=True)
 
-        valid_orders.append(row)
+    with arguments.input.open("r", encoding="utf-8", newline="") as file:
+        import csv
 
-total_revenue = 0
-product_sales = {}
+        reader = csv.DictReader(file)
+        rows = list(reader)
 
-for order in valid_orders:
-    total_revenue += order["revenue"]
+    valid_orders, invalid_orders, duplicate_orders = classify_orders(rows)
+    summary = summarize_orders(valid_orders, invalid_orders, duplicate_orders)
+    report_text = format_report(summary)
 
-    product = order["product"]
-    revenue = order["revenue"]
+    print()
+    print(report_text, end="")
 
-    product_sales[product] = product_sales.get(product, 0) + revenue
+    (reports_dir / SUMMARY_FILE_NAME).write_text(report_text, encoding="utf-8")
+    write_csv_report(reports_dir / CLEAN_ORDERS_FILE_NAME, CLEAN_FIELDNAMES, valid_orders)
+    write_csv_report(reports_dir / INVALID_ORDERS_FILE_NAME, ERROR_FIELDNAMES, invalid_orders)
+    write_csv_report(reports_dir / DUPLICATE_ORDERS_FILE_NAME, ERROR_FIELDNAMES, duplicate_orders)
 
-best_product = max(product_sales, key=product_sales.get)
-best_product_revenue = product_sales[best_product]
 
-print()
-print("Sales Data Quality Report")
-print("-------------------------")
-print(f"Valid orders: {len(valid_orders)}")
-print(f"Invalid orders: {len(invalid_orders)}")
-print(f"Duplicate orders: {len(duplicate_orders)}")
-print(f"Total revenue: ${total_revenue:.2f}")
-print(f"Best product: {best_product} (${best_product_revenue:.2f})")
-
-print()
-print("Revenue by Product")
-print("------------------")
-
-for product, revenue in product_sales.items():
-    print(f"{product}: ${revenue:.2f}")
-
-with open(SUMMARY_FILE, "w", encoding="utf-8") as file:
-    file.write("Sales Data Quality Report\n")
-    file.write("-------------------------\n")
-    file.write(f"Valid orders: {len(valid_orders)}\n")
-    file.write(f"Invalid orders: {len(invalid_orders)}\n")
-    file.write(f"Duplicate orders: {len(duplicate_orders)}\n")
-    file.write(f"Total revenue: ${total_revenue:.2f}\n")
-    file.write(f"Best product: {best_product} (${best_product_revenue:.2f})\n")
-    file.write("\nRevenue by Product\n")
-    file.write("------------------\n")
-
-    for product, revenue in product_sales.items():
-        file.write(f"{product}: ${revenue:.2f}\n")
-
-clean_fieldnames = [
-    "order_id",
-    "customer",
-    "product",
-    "quantity",
-    "unit_price",
-    "order_date",
-    "revenue",
-]
-
-error_fieldnames = [
-    "order_id",
-    "customer",
-    "product",
-    "quantity",
-    "unit_price",
-    "order_date",
-    "error",
-]
-
-with open(CLEAN_ORDERS_FILE, "w", encoding="utf-8", newline="") as file:
-    writer = csv.DictWriter(file, fieldnames=clean_fieldnames)
-    writer.writeheader()
-    writer.writerows(valid_orders)
-
-with open(INVALID_ORDERS_FILE, "w", encoding="utf-8", newline="") as file:
-    writer = csv.DictWriter(file, fieldnames=error_fieldnames)
-    writer.writeheader()
-    writer.writerows(invalid_orders)
-
-with open(DUPLICATE_ORDERS_FILE, "w", encoding="utf-8", newline="") as file:
-    writer = csv.DictWriter(file, fieldnames=error_fieldnames)
-    writer.writeheader()
-    writer.writerows(duplicate_orders)
+if __name__ == "__main__":
+    main()
