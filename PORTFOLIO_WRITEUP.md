@@ -60,7 +60,7 @@ Notes for interview talking points
 - Walk through the CI workflow and how tests prevent regressions.
 
 Contact & license
-- License: MIT (add LICENSE if needed)
+- License: MIT
 - Repo: local workspace; include GitHub link when publishing
 
 ## Screenshots

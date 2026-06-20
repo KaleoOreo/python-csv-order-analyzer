@@ -86,4 +86,4 @@ Contributions welcome — open issues or submit PRs. Keep changes small and incl
 
 ## License
 
-MIT License — see LICENSE (not included).
+MIT License — see LICENSE.
