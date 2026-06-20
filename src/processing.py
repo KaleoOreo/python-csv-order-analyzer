@@ -5,7 +5,14 @@ representing orders. It separates valid orders from invalid and duplicate
 entries so the rest of the pipeline can operate on clean data.
 """
 
+import math
+from numbers import Real
 from typing import List, Tuple, Dict, Any
+
+
+def is_missing_value(value: Any) -> bool:
+    """Return True for values that represent a blank CSV cell."""
+    return value is None or (isinstance(value, Real) and math.isnan(value))
 
 
 def normalize_row(row: Dict[str, Any]) -> Dict[str, str]:
@@ -13,7 +20,10 @@ def normalize_row(row: Dict[str, Any]) -> Dict[str, str]:
 
     Non-string values are coerced to strings before stripping.
     """
-    return {field_name: (str(field_value) if field_value is not None else "").strip() for field_name, field_value in row.items()}
+    return {
+        field_name: "" if is_missing_value(field_value) else str(field_value).strip()
+        for field_name, field_value in row.items()
+    }
 
 
 def classify_orders(rows: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]], List[Dict[str, Any]]]:

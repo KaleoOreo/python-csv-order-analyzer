@@ -24,6 +24,21 @@ def test_classify_orders_mixed_cases():
     assert abs(v["revenue"] - 56.5) < 1e-6
 
 
+def test_classify_orders_treats_nan_like_blank_cells():
+    rows = [
+        {"order_id": "2001", "customer": "Amy", "product": float("nan"), "quantity": "2", "unit_price": "28.25", "order_date": "2026-05-01"},
+        {"order_id": "2002", "customer": "Ben", "product": "Nibb-its", "quantity": "1", "unit_price": float("nan"), "order_date": "2026-05-01"},
+    ]
+
+    valid, invalid, duplicates = classify_orders(rows)
+
+    assert valid == []
+    assert duplicates == []
+    assert len(invalid) == 2
+    assert invalid[0]["error"] == "Missing product"
+    assert invalid[1]["error"] == "Invalid quantity or unit price"
+
+
 def test_summarize_orders_basic():
     valid_orders = [
         {"order_id": "1001", "customer": "Amy", "product": "P", "quantity": 2, "unit_price": 10.0, "revenue": 20.0},
